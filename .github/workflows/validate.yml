@@ -13,6 +13,6 @@ jobs:
           node-version: 14
           cache: yarn
       - run: yarn
-      - run: yarn test --silent
+      - run: yarn test:unit
       - run: yarn lint
 
