@@ -139,26 +139,29 @@ const makePgClient = async () => {
   return makePgApi(clientWithTable);
 };
 
-const validateDbApi = apiToTest => {
+const validateDbApi = (apiToTest) => {
   const apiToOverride = [
-    'updateOne',
-    'findOne',
-    'insertOne',
-    'deleteOne',
-    'clearAll',
-    'closeConnection',
+    "updateOne",
+    "findOne",
+    "insertOne",
+    "deleteOne",
+    "clearAll",
+    "closeConnection",
   ];
-  apiToOverride.forEach(methodName => {
-    if (typeof apiToTest[methodName] !== 'function') {
+  apiToOverride.forEach((methodName) => {
+    if (typeof apiToTest[methodName] !== "function") {
       throw new Error(`Function ${methodName} must be defined`);
     }
   });
   return apiToTest;
 };
 
+const makeClient = async (env) => {
+  return env.DB_TYPE === "mongo" ? makeMongoClient() : makePgClient();
+};
+
 module.exports = {
-  makeMongoClient,
-  makePgClient,
+  makeClient,
   makeMongoApi,
   makePgApi,
   makeTestDbApi,
