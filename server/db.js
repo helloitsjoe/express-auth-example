@@ -6,15 +6,15 @@ const { Client } = require('pg');
 const makeTestDbApi = () => {
   let mockDb = [];
 
-  const insertOne = data => {
+  const insertOne = (data) => {
     mockDb.push(data);
     return Promise.resolve(data);
   };
 
-  const findOne = query => {
+  const findOne = (query) => {
     // TODO: Match more than the first key
     const key = Object.keys(query)[0];
-    const found = mockDb.find(entry => entry[key] === query[key]) || null;
+    const found = mockDb.find((entry) => entry[key] === query[key]) || null;
     return Promise.resolve(found);
   };
 
@@ -31,9 +31,9 @@ const makeTestDbApi = () => {
     return Promise.resolve({ modifiedCount: 0 });
   };
 
-  const deleteOne = query => {
+  const deleteOne = (query) => {
     const key = Object.keys(query)[0];
-    mockDb = mockDb.filter(entry => entry[key] !== query[key]);
+    mockDb = mockDb.filter((entry) => entry[key] !== query[key]);
     return Promise.resolve({ deletedCount: 1 });
   };
 
@@ -43,21 +43,36 @@ const makeTestDbApi = () => {
 
   const closeConnection = () => {};
 
-  return { insertOne, findOne, updateOne, deleteOne, clearAll, closeConnection };
+  return {
+    insertOne,
+    findOne,
+    updateOne,
+    deleteOne,
+    clearAll,
+    closeConnection,
+  };
 };
 
 const makeMongoApi = (client, collection) => {
-  const insertOne = data => collection.insertOne(data);
-  const findOne = query => collection.findOne(query);
-  const updateOne = (query, update) => collection.updateOne(query, { $set: update });
-  const deleteOne = query => collection.deleteOne(query);
+  const insertOne = (data) => collection.insertOne(data);
+  const findOne = (query) => collection.findOne(query);
+  const updateOne = (query, update) =>
+    collection.updateOne(query, { $set: update });
+  const deleteOne = (query) => collection.deleteOne(query);
   const clearAll = () => collection.deleteMany({});
   const closeConnection = () => client.close();
 
-  return { insertOne, findOne, updateOne, deleteOne, clearAll, closeConnection };
+  return {
+    insertOne,
+    findOne,
+    updateOne,
+    deleteOne,
+    clearAll,
+    closeConnection,
+  };
 };
 
-const makePgApi = client => {
+const makePgApi = (client) => {
   const insertOne = async ({ username, hash, token, expiration }) => {
     const query =
       'INSERT INTO users(username, hash, token, expiration) VALUES($1, $2, $3, $4) RETURNING *';
@@ -69,9 +84,10 @@ const makePgApi = client => {
   const findOne = async ({ username, token }) => {
     // TODO: make this cleaner
     const query = username ? 'username' : 'token';
-    const users = await client.query(`SELECT * FROM users WHERE ${query} = $1`, [
-      username || token,
-    ]);
+    const users = await client.query(
+      `SELECT * FROM users WHERE ${query} = $1`,
+      [username || token]
+    );
     return users.rows[0] || null;
   };
 
@@ -90,12 +106,19 @@ const makePgApi = client => {
   const clearAll = async () => client.query('TRUNCATE users');
   const closeConnection = () => client.end();
 
-  return { insertOne, findOne, updateOne, deleteOne, clearAll, closeConnection };
+  return {
+    insertOne,
+    findOne,
+    updateOne,
+    deleteOne,
+    clearAll,
+    closeConnection,
+  };
 };
 
-const makeCollection = connection => connection.db().collection('users');
+const makeCollection = (connection) => connection.db().collection('users');
 
-const makeTable = async client => {
+const makeTable = async (client) => {
   await client.query(
     `
     CREATE TABLE IF NOT EXISTS users (
@@ -129,7 +152,9 @@ const makePgClient = async () => {
   await client.connect();
   console.log(`Connected to Postgres!`);
 
-  const dbCheck = await client.query("SELECT FROM pg_database WHERE datname = 'auth'");
+  const dbCheck = await client.query(
+    "SELECT FROM pg_database WHERE datname = 'auth'"
+  );
   if (!dbCheck.rowCount) {
     console.log('Creating DB...');
     await client.query(`CREATE DATABASE auth;`);
@@ -139,7 +164,7 @@ const makePgClient = async () => {
   return makePgApi(clientWithTable);
 };
 
-const validateDbApi = apiToTest => {
+const validateDbApi = (apiToTest) => {
   const apiToOverride = [
     'updateOne',
     'findOne',
@@ -148,7 +173,7 @@ const validateDbApi = apiToTest => {
     'clearAll',
     'closeConnection',
   ];
-  apiToOverride.forEach(methodName => {
+  apiToOverride.forEach((methodName) => {
     if (typeof apiToTest[methodName] !== 'function') {
       throw new Error(`Function ${methodName} must be defined`);
     }
@@ -156,9 +181,12 @@ const validateDbApi = apiToTest => {
   return apiToTest;
 };
 
+const makeClient = async (env) => {
+  return env.DB_TYPE === 'mongo' ? makeMongoClient() : makePgClient();
+};
+
 module.exports = {
-  makeMongoClient,
-  makePgClient,
+  makeClient,
   makeMongoApi,
   makePgApi,
   makeTestDbApi,

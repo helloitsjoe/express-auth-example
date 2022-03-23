@@ -1,4 +1,4 @@
-const makeDbMiddleware = db => (req, res, next) => {
+const makeDbMiddleware = (db) => (req, res, next) => {
   req.db = db;
   next();
 };

@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 /// <reference types="cypress" />
 
-const testId = id => `[data-testid="${id}"]`;
+const testId = (id) => `[data-testid="${id}"]`;
 
 describe('Auth', () => {
   beforeEach(() => {

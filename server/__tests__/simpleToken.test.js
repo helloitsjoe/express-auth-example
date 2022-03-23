@@ -18,8 +18,8 @@ let err;
 let server;
 let rootUrl;
 
-const getRootUrl = port => `http://localhost:${port}`;
-const setError = e => {
+const getRootUrl = (port) => `http://localhost:${port}`;
+const setError = (e) => {
   err = e;
 };
 
@@ -32,7 +32,7 @@ beforeEach(async () => {
   rootUrl = getRootUrl(port);
 });
 
-afterEach(done => {
+afterEach((done) => {
   db = null;
   err = null;
   rootUrl = null;
@@ -109,37 +109,50 @@ describe('simple-token', () => {
         const body = { password: 'bar' };
         await axios.post(`${rootUrl}/simple-token/login`, body).catch(setError);
         expect(err.response.status).toBe(401);
-        expect(err.response.data.message).toMatch(/username and password are both required/i);
+        expect(err.response.data.message).toMatch(
+          /username and password are both required/i
+        );
       });
 
       it('returns error if no password', async () => {
         const body = { username: 'foo' };
         await axios.post(`${rootUrl}/simple-token/login`, body).catch(setError);
         expect(err.response.status).toBe(401);
-        expect(err.response.data.message).toMatch(/username and password are both required/i);
+        expect(err.response.data.message).toMatch(
+          /username and password are both required/i
+        );
       });
 
       it('returns error if password does not match', async () => {
         const body = { username: 'foo', password: 'bar' };
         await axios.post(`${rootUrl}/simple-token/signup`, body);
         const wrong = { username: 'foo', password: 'not-bar' };
-        await axios.post(`${rootUrl}/simple-token/login`, wrong).catch(setError);
+        await axios
+          .post(`${rootUrl}/simple-token/login`, wrong)
+          .catch(setError);
         expect(err.response.status).toBe(401);
-        expect(err.response.data.message).toMatch(/username and password do not match/i);
+        expect(err.response.data.message).toMatch(
+          /username and password do not match/i
+        );
       });
 
       it('returns error if username does not exist', async () => {
         const body = { username: 'foo', password: 'bar' };
         await axios.post(`${rootUrl}/simple-token/login`, body).catch(setError);
         expect(err.response.status).toBe(401);
-        expect(err.response.data.message).toMatch(/username foo does not exist/i);
+        expect(err.response.data.message).toMatch(
+          /username foo does not exist/i
+        );
       });
     });
 
     describe('GET', () => {
       it('returns token for valid login', async () => {
         const body = { username: 'foo', password: 'bar' };
-        const { data } = await axios.post(`${rootUrl}/simple-token/signup`, body);
+        const { data } = await axios.post(
+          `${rootUrl}/simple-token/signup`,
+          body
+        );
         const options = { headers: { Authorization: `Bearer ${data.token}` } };
         const res = await axios.get(`${rootUrl}/simple-token/login`, options);
         expect(res.data.user.username).toBe(body.username);
@@ -153,7 +166,9 @@ describe('simple-token', () => {
 
         expect(token).toMatch(/\w+/);
         const options = { headers: { Authorization: `Bearer ${token}` } };
-        await axios.get(`${rootUrl}/simple-token/login`, options).catch(setError);
+        await axios
+          .get(`${rootUrl}/simple-token/login`, options)
+          .catch(setError);
         expect(err.response.data.message).toMatch(/expired/i);
       });
     });
@@ -167,7 +182,11 @@ describe('simple-token', () => {
 
       expect(token).toMatch(/\w+/);
       const options = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await axios.post(`${rootUrl}/simple-token/secure`, body, options);
+      const res = await axios.post(
+        `${rootUrl}/simple-token/secure`,
+        body,
+        options
+      );
       expect(res.data.message).toMatch('Hello from simple-token auth, foo!');
     });
 
@@ -185,18 +204,26 @@ describe('simple-token', () => {
 
       it('returns response if valid token', async () => {
         const options = { headers: { Authorization: `Bearer ${token}` } };
-        const res = await axios.post(`${rootUrl}/simple-token/secure`, body, options);
+        const res = await axios.post(
+          `${rootUrl}/simple-token/secure`,
+          body,
+          options
+        );
         expect(res.data.message).toMatch('Hello from simple-token auth, foo!');
       });
 
       it('returns error if no token', async () => {
-        await axios.post(`${rootUrl}/simple-token/secure`, body).catch(setError);
+        await axios
+          .post(`${rootUrl}/simple-token/secure`, body)
+          .catch(setError);
         expect(err.response.data.message).toMatch(/Unauthorized!/i);
       });
 
       it('returns error if invalid token', async () => {
         const options = { headers: { Authorization: `Bearer not-token` } };
-        await axios.post(`${rootUrl}/simple-token/secure`, body, options).catch(setError);
+        await axios
+          .post(`${rootUrl}/simple-token/secure`, body, options)
+          .catch(setError);
         expect(err.response.data.message).toMatch(/Unauthorized!/i);
       });
 
@@ -225,7 +252,11 @@ describe('simple-token', () => {
       expect(res.data.token).toMatch(/\w+/);
 
       options = { headers: { Authorization: `Bearer ${token}` } };
-      const secureRes = await axios.post(`${rootUrl}/simple-token/secure`, body, options);
+      const secureRes = await axios.post(
+        `${rootUrl}/simple-token/secure`,
+        body,
+        options
+      );
       expect(secureRes.data.message).toMatch(/hello/i);
     });
 
@@ -235,16 +266,22 @@ describe('simple-token', () => {
     });
 
     it('revokes token with valid token', async () => {
-      const revokedRes = await axios.post(`${rootUrl}/simple-token/logout`, { token });
+      const revokedRes = await axios.post(`${rootUrl}/simple-token/logout`, {
+        token,
+      });
       expect(revokedRes.data.token).toBe(token);
 
-      await axios.post(`${rootUrl}/simple-token/secure`, body, options).catch(setError);
+      await axios
+        .post(`${rootUrl}/simple-token/secure`, body, options)
+        .catch(setError);
       expect(err.response.status).toBe(403);
       expect(err.response.data.message).toMatch(/unauthorized/i);
     });
 
     it('user is still in db', async () => {
-      const revokedRes = await axios.post(`${rootUrl}/simple-token/logout`, { token });
+      const revokedRes = await axios.post(`${rootUrl}/simple-token/logout`, {
+        token,
+      });
       expect(revokedRes.data.token).toBe(token);
 
       await axios.post(`${rootUrl}/simple-token/signup`, body).catch(setError);
@@ -253,16 +290,22 @@ describe('simple-token', () => {
     });
 
     it('responds with 404 if user has alrady logged out', async () => {
-      const revokedRes = await axios.post(`${rootUrl}/simple-token/logout`, { token });
+      const revokedRes = await axios.post(`${rootUrl}/simple-token/logout`, {
+        token,
+      });
       expect(revokedRes.data.token).toBe(token);
 
-      await axios.post(`${rootUrl}/simple-token/logout`, { token }).catch(setError);
+      await axios
+        .post(`${rootUrl}/simple-token/logout`, { token })
+        .catch(setError);
       expect(err.response.status).toBe(404);
       expect(err.response.data.message).toMatch(/token not found/i);
     });
 
     it('responds with 404 if no token exists for username', async () => {
-      await axios.post(`${rootUrl}/simple-token/logout`, { token: 'foo' }).catch(setError);
+      await axios
+        .post(`${rootUrl}/simple-token/logout`, { token: 'foo' })
+        .catch(setError);
       expect(err.response.status).toBe(404);
       expect(err.response.data.message).toMatch(/token not found/i);
     });

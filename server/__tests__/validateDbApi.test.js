@@ -1,5 +1,10 @@
 /* eslint-disable indent */
-const { validateDbApi, makeTestDbApi, makeMongoApi, makePgApi } = require('../db');
+const {
+  validateDbApi,
+  makeTestDbApi,
+  makeMongoApi,
+  makePgApi,
+} = require('../db');
 
 describe('validateDbApi', () => {
   it.each`
@@ -20,7 +25,9 @@ describe('validateDbApi', () => {
       closeConnection: () => {},
     };
     api[methodName] = null;
-    expect(() => validateDbApi(api)).toThrow(`Function ${methodName} must be defined`);
+    expect(() => validateDbApi(api)).toThrow(
+      `Function ${methodName} must be defined`
+    );
   });
 
   it('validates testDbApi', () => {
