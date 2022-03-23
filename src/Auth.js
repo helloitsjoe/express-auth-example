@@ -12,12 +12,12 @@ const FormColumn = styled.div`
   min-width: 20em;
 `;
 
-const useForm = initialValues => {
+const useForm = (initialValues) => {
   const [values, setValues] = React.useState(initialValues);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setValues(prev => ({ ...prev, [name]: value }));
+    setValues((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleResetForm = () => {
@@ -33,7 +33,13 @@ const queryReducer = (s, a) => {
       return { ...s, status: 'LOADING', errorMessage: '' };
     case 'fetch_success':
       console.log(`success:`, a.payload);
-      return { ...s, status: 'SUCCESS', data: a.payload, fetchFn: login, buttonText: 'Log In' };
+      return {
+        ...s,
+        status: 'SUCCESS',
+        data: a.payload,
+        fetchFn: login,
+        buttonText: 'Log In',
+      };
     case 'fetch_error':
       console.log(`error:`, a.payload);
       return { ...s, status: 'ERROR', errorMessage: a.payload };
@@ -68,7 +74,10 @@ const useFetch = () => {
 };
 
 const Form = ({ id, action }) => {
-  const { handleChange, handleResetForm, values } = useForm({ username: '', password: '' });
+  const { handleChange, handleResetForm, values } = useForm({
+    username: '',
+    password: '',
+  });
   const { authLogIn, authLogOut, isLoggedIn, token } = useAuth();
   const { status, errorMessage, dispatch } = useFetch();
 
@@ -86,18 +95,21 @@ const Form = ({ id, action }) => {
     if (!token) return;
 
     checkLoggedIn({ endpoint, token })
-      .then(res => {
+      .then((res) => {
         console.log(`res.data:`, res.data);
         const { username } = res.data.user;
         console.log(`username:`, username);
         authLogIn({ username, token });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(`err:`, err);
         authLogOut();
         const { message } = (err.response && err.response.data) || err;
         if (!message.match(/expired/i)) {
-          return dispatch({ type: 'fetch_error', payload: message || err.response.status });
+          return dispatch({
+            type: 'fetch_error',
+            payload: message || err.response.status,
+          });
         }
         // TODO: Refresh token
         console.log('Expired token, logging out...');
@@ -105,26 +117,29 @@ const Form = ({ id, action }) => {
       });
   }, [token, endpoint]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const { username, password } = values;
 
     dispatch({ type: 'fetch' });
     fetchFn({ endpoint, username, password, token })
-      .then(res => {
+      .then((res) => {
         // TODO: Use sid instead of token
         console.log(res.data);
         authLogIn({ username, token: res.data.token });
         handleResetForm();
         dispatch({ type: 'fetch_success', payload: res.data });
       })
-      .catch(err => {
+      .catch((err) => {
         const { message } = (err.response && err.response.data) || err;
-        dispatch({ type: 'fetch_error', payload: message || err.response.status });
+        dispatch({
+          type: 'fetch_error',
+          payload: message || err.response.status,
+        });
       });
   };
 
-  const handleLogOut = e => {
+  const handleLogOut = (e) => {
     e.preventDefault();
     dispatch({ type: 'logout' });
 
@@ -132,15 +147,18 @@ const Form = ({ id, action }) => {
     if (endpoint.match(/jwt/)) return dispatch({ type: 'logout_success' });
 
     return logOut({ endpoint, token })
-      .then(res => {
+      .then((res) => {
         console.log('logged out', res.data);
         authLogOut();
         dispatch({ type: 'logout_success' });
       })
-      .catch(err => {
+      .catch((err) => {
         authLogOut();
         const { message } = (err.response && err.response.data) || err;
-        dispatch({ type: 'fetch_error', payload: message || err.response.status });
+        dispatch({
+          type: 'fetch_error',
+          payload: message || err.response.status,
+        });
       });
   };
 
@@ -148,7 +166,12 @@ const Form = ({ id, action }) => {
     <form onSubmit={isLoggedIn ? handleLogOut : handleSubmit}>
       <FormColumn>
         {isLoggedIn ? (
-          <Button secondary fullWidth data-testid={`${id}-logout`} type="submit">
+          <Button
+            secondary
+            fullWidth
+            data-testid={`${id}-logout`}
+            type="submit"
+          >
             Log Out
           </Button>
         ) : (
@@ -169,7 +192,12 @@ const Form = ({ id, action }) => {
               value={values.password}
               onChange={handleChange}
             />
-            <Button fullWidth data-testid={`${id}-login-submit`} type="submit" disabled={isLoading}>
+            <Button
+              fullWidth
+              data-testid={`${id}-login-submit`}
+              type="submit"
+              disabled={isLoading}
+            >
               {getButtonText()}
             </Button>
           </>
@@ -194,18 +222,22 @@ const SendMessage = ({ id }) => {
     dispatch({ type: 'clear_error' });
   }, [isLoggedIn, dispatch]);
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const { secureMessage } = values;
 
     dispatch({ type: 'fetch' });
     sendSecure({ endpoint, message: secureMessage, token })
-      .then(res => {
+      .then((res) => {
         dispatch({ type: 'fetch_success', payload: res.data });
       })
-      .catch(err => {
-        const { message: errMessage } = (err.response && err.response.data) || err;
-        dispatch({ type: 'fetch_error', payload: errMessage || err.response.status });
+      .catch((err) => {
+        const { message: errMessage } =
+          (err.response && err.response.data) || err;
+        dispatch({
+          type: 'fetch_error',
+          payload: errMessage || err.response.status,
+        });
       });
   };
 

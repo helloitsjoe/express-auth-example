@@ -7,7 +7,11 @@ import OAuth from './OAuth';
 
 const config = {
   jwt: { id: 'jwt', title: 'JWT', Component: Auth },
-  'simple-token': { id: 'simple-token', title: 'Simple Token', Component: Auth },
+  'simple-token': {
+    id: 'simple-token',
+    title: 'Simple Token',
+    Component: Auth,
+  },
   session: { id: 'session', title: 'Session', Component: Auth },
   oauth: { id: 'oauth', title: 'OAuth', Component: OAuth },
 };

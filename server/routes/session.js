@@ -2,7 +2,11 @@
 /* eslint-disable camelcase */
 const bcrypt = require('bcrypt');
 const express = require('express');
-const { generateRandom, makeResponse, ONE_HOUR_IN_SECONDS } = require('../utils');
+const {
+  generateRandom,
+  makeResponse,
+  ONE_HOUR_IN_SECONDS,
+} = require('../utils');
 
 const router = express.Router();
 
@@ -12,7 +16,10 @@ const SALT_ROUNDS = 1;
 const handleSignUp = async ({ username, password }, db) => {
   const { users } = db;
   if (!username || !password) {
-    return makeResponse({ message: 'Username and password are both required.', status: 401 });
+    return makeResponse({
+      message: 'Username and password are both required.',
+      status: 401,
+    });
   }
 
   const user = await users.findOne({ username });
@@ -24,7 +31,12 @@ const handleSignUp = async ({ username, password }, db) => {
   const hash = await bcrypt.hash(password, SALT_ROUNDS).catch(console.error);
   const token = generateRandom(50);
 
-  await users.insertOne({ username, hash, token, expires_in: TOKEN_EXPIRATION });
+  await users.insertOne({
+    username,
+    hash,
+    token,
+    expires_in: TOKEN_EXPIRATION,
+  });
 
   // const session = { user };
 
@@ -34,20 +46,29 @@ const handleSignUp = async ({ username, password }, db) => {
 const handleLogin = async ({ username, password }, db) => {
   const { users } = db;
   if (!username || !password) {
-    return makeResponse({ message: 'Username and password are both required.', status: 401 });
+    return makeResponse({
+      message: 'Username and password are both required.',
+      status: 401,
+    });
   }
 
   const user = await users.findOne({ username });
 
   if (!user) {
     // TODO: Don't return messages like this to the client (insecure)
-    return makeResponse({ message: `Username ${username} does not exist`, status: 401 });
+    return makeResponse({
+      message: `Username ${username} does not exist`,
+      status: 401,
+    });
   }
 
   const valid = await bcrypt.compare(password, user.hash);
 
   if (!valid) {
-    return makeResponse({ message: 'Username and password do not match', status: 401 });
+    return makeResponse({
+      message: 'Username and password do not match',
+      status: 401,
+    });
   }
   const token = generateRandom(50);
   // TODO: Make expired error
@@ -81,7 +102,7 @@ const sessionMiddleware = async (req, res, next) => {
 router.post('/signup', async (req, res, next) => {
   const { status, ...rest } = await handleSignUp(req.body, req.db);
   req.session.user = rest.token;
-  req.sessionStore.set(req.session.id, req.session, err => {
+  req.sessionStore.set(req.session.id, req.session, (err) => {
     if (err) next(err);
     res.status(status).json(rest);
   });
@@ -90,7 +111,7 @@ router.post('/signup', async (req, res, next) => {
 router.post('/login', async (req, res, next) => {
   const { status, ...rest } = await handleLogin(req.body, req.db);
   req.session.user = rest.token;
-  req.sessionStore.set(req.session.id, req.session, err => {
+  req.sessionStore.set(req.session.id, req.session, (err) => {
     if (err) next(err);
     res.status(status).json(rest);
   });
@@ -102,15 +123,19 @@ router.get('/login', sessionMiddleware, (req, res) => {
 });
 
 router.post('/secure', sessionMiddleware, async (req, res) => {
-  return res.json({ message: `Hello from session auth, ${req.user.username}!` });
+  return res.json({
+    message: `Hello from session auth, ${req.user.username}!`,
+  });
 });
 
 router.post('/logout', async (req, res) => {
   // TODO: admin auth
   const { cookie } = req.headers;
-  if (!cookie) return res.status(401).json({ message: 'No Session ID provided' });
+  if (!cookie) {
+    return res.status(401).json({ message: 'No Session ID provided' });
+  }
 
-  req.sessionStore.destroy(req.session.id, err => {
+  req.sessionStore.destroy(req.session.id, (err) => {
     if (err) return res.status(500).json({ message: err.message });
     return res.json({ message: 'You have been logged out' });
   });

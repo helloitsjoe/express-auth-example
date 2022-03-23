@@ -12,12 +12,16 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../../public', 'oauth-dialog.html'));
-  // fs.readFile(path.join(__dirname, '../../public', 'oauth-dialog.html'), 'utf-8', (err, html) => {
-  //   console.log(`html:`, html);
-  //   const htmlWithData = html.replace('REDIRECT_TO', req.query.redirect_to);
-  //   console.log(`htmlWithData:`, htmlWithData);
-  //   res.send(htmlWithData);
-  // });
+  // fs.readFile(
+  //   path.join(__dirname, '../../public', 'oauth-dialog.html'),
+  //   'utf-8',
+  //   (err, html) => {
+  //     console.log(`html:`, html);
+  //     const htmlWithData = html.replace('REDIRECT_TO', req.query.redirect_to);
+  //     console.log(`htmlWithData:`, htmlWithData);
+  //     res.send(htmlWithData);
+  //   }
+  // );
 });
 
 router.get('/code', (req, res) => {

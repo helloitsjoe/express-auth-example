@@ -11,7 +11,10 @@ const SALT_ROUNDS = 1;
 const handleSignUp = async ({ username, password }, db) => {
   const { users } = db;
   if (!username || !password) {
-    return makeResponse({ message: 'Username and password are both required.', status: 401 });
+    return makeResponse({
+      message: 'Username and password are both required.',
+      status: 401,
+    });
   }
 
   const user = await users.findOne({ username });
@@ -24,7 +27,12 @@ const handleSignUp = async ({ username, password }, db) => {
   const token = generateRandom(50);
 
   // Note: This will be a timestamp without a timezone. Better to use an ISO string.
-  await users.insertOne({ username, hash, token, expiration: Date.now() + getTokenExp() * 1000 });
+  await users.insertOne({
+    username,
+    hash,
+    token,
+    expiration: Date.now() + getTokenExp() * 1000,
+  });
 
   return makeResponse({ token });
 };
@@ -32,23 +40,35 @@ const handleSignUp = async ({ username, password }, db) => {
 const handleLogin = async ({ username, password }, db) => {
   const { users } = db;
   if (!username || !password) {
-    return makeResponse({ message: 'Username and password are both required.', status: 401 });
+    return makeResponse({
+      message: 'Username and password are both required.',
+      status: 401,
+    });
   }
 
   const user = await users.findOne({ username });
 
   if (!user) {
-    return makeResponse({ message: `Username ${username} does not exist`, status: 401 });
+    return makeResponse({
+      message: `Username ${username} does not exist`,
+      status: 401,
+    });
   }
 
   const valid = await bcrypt.compare(password, user.hash);
 
   if (!valid) {
-    return makeResponse({ message: 'Username and password do not match', status: 401 });
+    return makeResponse({
+      message: 'Username and password do not match',
+      status: 401,
+    });
   }
   const token = generateRandom(50);
 
-  await users.updateOne({ username }, { token, expiration: Date.now() + getTokenExp() * 1000 });
+  await users.updateOne(
+    { username },
+    { token, expiration: Date.now() + getTokenExp() * 1000 }
+  );
   return makeResponse({ token });
 };
 
@@ -90,7 +110,9 @@ router.get('/login', simpleTokenMiddleware, (req, res) => {
 });
 
 router.post('/secure', simpleTokenMiddleware, async (req, res) => {
-  return res.json({ message: `Hello from simple-token auth, ${req.user.username}!` });
+  return res.json({
+    message: `Hello from simple-token auth, ${req.user.username}!`,
+  });
 });
 
 router.post('/logout', async (req, res) => {

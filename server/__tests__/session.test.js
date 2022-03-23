@@ -18,8 +18,8 @@ let err;
 let server;
 let rootUrl;
 
-const getRootUrl = port => `http://localhost:${port}`;
-const setError = e => {
+const getRootUrl = (port) => `http://localhost:${port}`;
+const setError = (e) => {
   err = e;
 };
 
@@ -32,7 +32,7 @@ beforeEach(async () => {
   rootUrl = getRootUrl(port);
 });
 
-afterEach(done => {
+afterEach((done) => {
   db = null;
   err = null;
   rootUrl = null;
@@ -110,14 +110,18 @@ describe('session', () => {
         const body = { password: 'bar' };
         await axios.post(`${rootUrl}/session/login`, body).catch(setError);
         expect(err.response.status).toBe(401);
-        expect(err.response.data.message).toMatch(/username and password are both required/i);
+        expect(err.response.data.message).toMatch(
+          /username and password are both required/i
+        );
       });
 
       it('returns error if no password', async () => {
         const body = { username: 'foo' };
         await axios.post(`${rootUrl}/session/login`, body).catch(setError);
         expect(err.response.status).toBe(401);
-        expect(err.response.data.message).toMatch(/username and password are both required/i);
+        expect(err.response.data.message).toMatch(
+          /username and password are both required/i
+        );
       });
 
       it('returns error if password does not match', async () => {
@@ -126,14 +130,18 @@ describe('session', () => {
         const wrong = { username: 'foo', password: 'not-bar' };
         await axios.post(`${rootUrl}/session/login`, wrong).catch(setError);
         expect(err.response.status).toBe(401);
-        expect(err.response.data.message).toMatch(/username and password do not match/i);
+        expect(err.response.data.message).toMatch(
+          /username and password do not match/i
+        );
       });
 
       it('returns error if username does not exist', async () => {
         const body = { username: 'foo', password: 'bar' };
         await axios.post(`${rootUrl}/session/login`, body).catch(setError);
         expect(err.response.status).toBe(401);
-        expect(err.response.data.message).toMatch(/username foo does not exist/i);
+        expect(err.response.data.message).toMatch(
+          /username foo does not exist/i
+        );
       });
     });
 
@@ -148,7 +156,7 @@ describe('session', () => {
         expect(res.data.user.username).toBe(body.username);
       });
 
-      it('returns error for expired cookie', done => {
+      it('returns error for expired cookie', (done) => {
         getTokenExp.mockReturnValue(ONE_HOUR_IN_SECONDS * -1);
 
         server.close(async () => {
@@ -194,7 +202,11 @@ describe('session', () => {
 
       it('returns response if valid session', async () => {
         const options = { headers: { cookie } };
-        const res = await axios.post(`${rootUrl}/session/secure`, body, options);
+        const res = await axios.post(
+          `${rootUrl}/session/secure`,
+          body,
+          options
+        );
         expect(res.data.message).toMatch('Hello from session auth, foo!');
       });
 
@@ -205,7 +217,9 @@ describe('session', () => {
 
       it('returns error if invalid cookie', async () => {
         const options = { headers: { cookie: 'connect.sid=not-right' } };
-        await axios.post(`${rootUrl}/session/secure`, body, options).catch(setError);
+        await axios
+          .post(`${rootUrl}/session/secure`, body, options)
+          .catch(setError);
         expect(err.response.data.message).toMatch(/Unauthorized!/i);
       });
 
@@ -234,7 +248,11 @@ describe('session', () => {
       expect(cookie).toMatch(/connect.sid=/);
 
       options = { headers: { cookie } };
-      const secureRes = await axios.post(`${rootUrl}/session/secure`, body, options);
+      const secureRes = await axios.post(
+        `${rootUrl}/session/secure`,
+        body,
+        options
+      );
       expect(secureRes.data.message).toMatch(/hello/i);
     });
 
@@ -244,16 +262,26 @@ describe('session', () => {
     });
 
     it('revokes token with valid cookie', async () => {
-      const revokedRes = await axios.post(`${rootUrl}/session/logout`, {}, options);
+      const revokedRes = await axios.post(
+        `${rootUrl}/session/logout`,
+        {},
+        options
+      );
       expect(revokedRes.data.message).toMatch(/logged out/i);
 
-      await axios.post(`${rootUrl}/session/secure`, body, options).catch(setError);
+      await axios
+        .post(`${rootUrl}/session/secure`, body, options)
+        .catch(setError);
       expect(err.response.status).toBe(401);
       expect(err.response.data.message).toMatch(/unauthorized/i);
     });
 
     it('user is still in db', async () => {
-      const revokedRes = await axios.post(`${rootUrl}/session/logout`, {}, options);
+      const revokedRes = await axios.post(
+        `${rootUrl}/session/logout`,
+        {},
+        options
+      );
       expect(revokedRes.data.message).toMatch(/logged out/i);
 
       await axios.post(`${rootUrl}/session/signup`, body).catch(setError);

@@ -1,4 +1,4 @@
-const { makeMongoClient, makePgClient, makeTestDbApi } = require('../db');
+const { makeClient, makeTestDbApi } = require('../db');
 
 let db;
 
@@ -57,7 +57,7 @@ describe('Mock DB', () => {
 
 describe('Postgres DB', () => {
   beforeEach(async () => {
-    db = await makePgClient();
+    db = await makeClient({ DB_TYPE: 'postres' });
     await db.clearAll();
   });
 
@@ -69,7 +69,7 @@ describe('Postgres DB', () => {
 
 describe('Mongo DB', () => {
   beforeEach(async () => {
-    db = await makeMongoClient();
+    db = await makeClient({ DB_TYPE: 'mongo' });
     await db.clearAll();
   });
 

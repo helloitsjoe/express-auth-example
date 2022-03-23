@@ -17,7 +17,7 @@ const makeServer = async (port = 3000) => {
       return resolve(server);
     });
 
-    server.on('error', e => {
+    server.on('error', (e) => {
       console.error(e);
       reject(e);
     });

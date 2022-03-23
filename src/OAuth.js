@@ -12,23 +12,23 @@ const OAuth = ({ title }) => {
   const handleOauth = () => {
     setErrorMessage('');
     return oauth()
-      .then(token => {
+      .then((token) => {
         setAuthToken(token);
       })
-      .catch(err => {
+      .catch((err) => {
         setAuthToken(null);
         setErrorMessage(err.message);
       });
   };
 
-  const handleSendSecure = e => {
+  const handleSendSecure = (e) => {
     e.preventDefault();
     setErrorMessage('');
     return updateSecureData(message, authToken)
-      .then(res => {
+      .then((res) => {
         setSecureData(res.data.message);
       })
-      .catch(err => {
+      .catch((err) => {
         setSecureData(null);
         setErrorMessage(err.message);
       });
@@ -57,7 +57,7 @@ const OAuth = ({ title }) => {
         <Input
           data-testid="oauth-message-input"
           placeholder="Post a message after you log in"
-          onChange={e => setMessage(e.target.value)}
+          onChange={(e) => setMessage(e.target.value)}
           value={message}
         />
         <div>
