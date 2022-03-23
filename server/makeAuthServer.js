@@ -24,7 +24,7 @@ const makeAuthServer = async (port = 3001, db) => {
     app.use(bodyParser.json());
     app.use(
       expressSession({
-        secret: process.env.EXPRESS_SESSION_SECRET,
+        secret: process.env.EXPRESS_SESSION_SECRET || 'no secret',
         resave: false,
         saveUninitialized: true,
         cookie: {
