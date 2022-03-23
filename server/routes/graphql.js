@@ -1,11 +1,11 @@
 const express = require('express');
-const { makeExecutableSchema } = require('graphql-tools');
-const { buildSchema } = require('graphql');
+// const { makeExecutableSchema } = require('graphql-tools');
+// const { buildSchema } = require('graphql');
 
-const typeDefs = [];
-const resolvers = {};
+// const typeDefs = [];
+// const resolvers = {};
 
-const schema = makeExecutableSchema({ typeDefs, resolvers });
+// const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 // const basicSchema = buildSchema(`
 //   type Query {
@@ -18,14 +18,14 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 // };
 
 // const gql = gqlHTTP(() => ({
-//   schema: basicSchema,
+//   schema,
 //   rootValue,
 //   graphiql: true,
 // }));
 
 const router = express.Router();
 
-router.post('/', gql);
-router.get('/', gql);
+router.post('/', () => {});
+router.get('/', () => {});
 
 module.exports = router;

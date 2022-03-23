@@ -131,8 +131,9 @@ router.post('/secure', sessionMiddleware, async (req, res) => {
 router.post('/logout', async (req, res) => {
   // TODO: admin auth
   const { cookie } = req.headers;
-  if (!cookie)
+  if (!cookie) {
     return res.status(401).json({ message: 'No Session ID provided' });
+  }
 
   req.sessionStore.destroy(req.session.id, (err) => {
     if (err) return res.status(500).json({ message: err.message });
