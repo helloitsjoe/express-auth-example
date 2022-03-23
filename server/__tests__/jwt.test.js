@@ -18,10 +18,12 @@ let err;
 let server;
 let rootUrl;
 
-const jwtRegEx = new RegExp(/^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/);
+const jwtRegEx = new RegExp(
+  /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/
+);
 
-const getRootUrl = port => `http://localhost:${port}`;
-const setError = e => {
+const getRootUrl = (port) => `http://localhost:${port}`;
+const setError = (e) => {
   err = e;
 };
 
@@ -34,7 +36,7 @@ beforeEach(async () => {
   getTokenExp.mockReturnValue('1h');
 });
 
-afterEach(done => {
+afterEach((done) => {
   server.close(done);
   jest.clearAllMocks();
 });
@@ -131,14 +133,18 @@ describe('jwt', () => {
 
     it('returns error if no token', async () => {
       await axios.post(`${rootUrl}/jwt/secure`, body).catch(setError);
-      expect(err.response.data.message).toMatch(/Authorization header is required/i);
+      expect(err.response.data.message).toMatch(
+        /Authorization header is required/i
+      );
     });
 
     it('returns error if header is malformed', async () => {
       // Missing 'Bearer ';
       const options = { headers: { Authorization: token } };
       await axios.post(`${rootUrl}/jwt/secure`, body, options).catch(setError);
-      expect(err.response.data.message).toMatch(/Unauthorized! jwt must be provided/i);
+      expect(err.response.data.message).toMatch(
+        /Unauthorized! jwt must be provided/i
+      );
     });
 
     it('returns error if invalid token', async () => {

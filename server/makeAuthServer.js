@@ -46,13 +46,15 @@ const makeAuthServer = async (port = 3001, db) => {
   app.use(errorMiddleware);
 
   return new Promise((resolve, reject) => {
-    server.on('error', e => {
+    server.on('error', (e) => {
       console.error(e);
       reject(e);
     });
 
     server.listen(port, () => {
-      console.log(`Auth Server listening on http://localhost:${server.address().port}`);
+      console.log(
+        `Auth Server listening on http://localhost:${server.address().port}`
+      );
       return resolve(server);
     });
   });

@@ -16,7 +16,9 @@ const token = '123';
 
 describe('Services', () => {
   it('login sends username and password to endpoint', async () => {
-    nock(URL).post('/jwt/login', { username, password }).reply(200, null, headers);
+    nock(URL)
+      .post('/jwt/login', { username, password })
+      .reply(200, null, headers);
     const res = await login({ endpoint: '/jwt', username, password });
     expect(res.status).toBe(200);
   });
@@ -31,7 +33,9 @@ describe('Services', () => {
   });
 
   it('signUp hits signup endpoint with username/password', async () => {
-    nock(URL).post('/simple-token/signup', { username, password }).reply(200, null, headers);
+    nock(URL)
+      .post('/simple-token/signup', { username, password })
+      .reply(200, null, headers);
     const res = await signUp({ endpoint: '/simple-token', username, password });
     expect(res.status).toBe(200);
   });
@@ -47,7 +51,11 @@ describe('Services', () => {
     nock(URL, { reqheaders: { authorization: 'Bearer aaa' } })
       .post('/session/secure', { message: 'hi' })
       .reply(200, null, headers);
-    const res = await sendSecure({ endpoint: '/session', message: 'hi', token: 'aaa' });
+    const res = await sendSecure({
+      endpoint: '/session',
+      message: 'hi',
+      token: 'aaa',
+    });
     expect(res.status).toBe(200);
   });
 });

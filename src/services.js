@@ -14,15 +14,21 @@ export const wait = (ms = DEFAULT_MS, shouldFail = false) =>
   );
 
 export function signUp({ endpoint, username, password }) {
-  return wait().then(() => axios.post(getUrl(`${endpoint}/signup`, 3001), { username, password }));
+  return wait().then(() =>
+    axios.post(getUrl(`${endpoint}/signup`, 3001), { username, password })
+  );
 }
 
 export function login({ endpoint, username, password }) {
-  return wait().then(() => axios.post(getUrl(`${endpoint}/login`, 3001), { username, password }));
+  return wait().then(() =>
+    axios.post(getUrl(`${endpoint}/login`, 3001), { username, password })
+  );
 }
 
 export function logOut({ endpoint, token }) {
-  return wait().then(() => axios.post(getUrl(`${endpoint}/logout`, 3001), { token }));
+  return wait().then(() =>
+    axios.post(getUrl(`${endpoint}/logout`, 3001), { token })
+  );
 }
 
 export function checkLoggedIn({ endpoint, token }) {
@@ -40,7 +46,11 @@ export function sendSecure({ endpoint, message, token }) {
     axios.post(
       getUrl(`${endpoint}/secure`, 3001),
       { message },
-      { headers: { Authorization: `Bearer ${token}` }, withCredentials: true, crossDomain: true }
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+        crossDomain: true,
+      }
     )
   );
 }

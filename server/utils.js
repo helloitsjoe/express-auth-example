@@ -13,7 +13,7 @@ const makeResponse = ({ message, token, status = 200 }) => ({
   token,
 });
 
-const generateRandom = len => {
+const generateRandom = (len) => {
   const rand = crypto
     .randomBytes(len)
     .toString('base64')
@@ -24,7 +24,7 @@ const generateRandom = len => {
   return rand;
 };
 
-const getCookie = res => {
+const getCookie = (res) => {
   const [cookie] = res.headers['set-cookie'] || [];
   return cookie;
 };

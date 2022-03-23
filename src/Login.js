@@ -29,17 +29,17 @@ const Tab = styled.button`
   background: none;
   width: 100%;
   padding: 1em;
-  color: ${props => (props.active ? 'black' : 'gray')};
-  background-color: ${props => (props.active ? 'white' : '#eee')};
-  font-weight: ${props => (props.active ? 'bold' : 'regular')};
+  color: ${(props) => (props.active ? 'black' : 'gray')};
+  background-color: ${(props) => (props.active ? 'white' : '#eee')};
+  font-weight: ${(props) => (props.active ? 'bold' : 'regular')};
   border-right: 1px solid white;
   &:last-child {
     border-right: none;
   }
   &:focus {
     outline: none;
-    box-shadow: 0px ${({ placement }) => (placement === 'top' ? '3px' : '-3px')} 0px inset
-      dodgerblue;
+    box-shadow: 0px ${({ placement }) => (placement === 'top' ? '3px' : '-3px')}
+      0px inset dodgerblue;
     /* border-bottom: 3px solid red; */
   }
 `;
@@ -59,14 +59,22 @@ const getInitialId = () => {
 };
 
 const Login = ({ children, config = {} }) => {
-  const [currentId, setCurrentId] = useState(getInitialId() || Object.keys(config)[0]);
+  const [currentId, setCurrentId] = useState(
+    getInitialId() || Object.keys(config)[0]
+  );
   const [currentAction, setCurrentAction] = useState(Actions.LOGIN);
 
   console.log(`currentId:`, currentId);
 
   return (
     <LoginContext.Provider
-      value={{ currentId, setCurrentId, currentAction, setCurrentAction, config }}
+      value={{
+        currentId,
+        setCurrentId,
+        currentAction,
+        setCurrentAction,
+        config,
+      }}
     >
       <LoginWrapper>{children}</LoginWrapper>
     </LoginContext.Provider>
