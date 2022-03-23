@@ -13,39 +13,39 @@ const { makeDbMiddleware, errorMiddleware } = require('./middleware');
 const { getTokenExp } = require('./utils');
 
 const makeAuthServer = async (port = 3001, db) => {
-  const app = express();
-  const server = http.createServer(app);
-
-  // HTML and API need to live on the same port for session auth, haven't
-  // figured out how to get cross-domain cookies working.
-  app.use(express.static(path.join(__dirname, '../public')));
-  app.use(cors());
-  app.use(bodyParser.json());
-  app.use(
-    expressSession({
-      secret: process.env.EXPRESS_SESSION_SECRET,
-      resave: false,
-      saveUninitialized: true,
-      cookie: {
-        maxAge: getTokenExp() * 1000,
-      },
-    })
-  );
-  app.use(makeDbMiddleware(db));
-
-  app.use('/jwt', jwt);
-  app.use('/session', session);
-  app.use('/oauth', oauth);
-  // NOTE: simple-token is not a secure method of auth, only
-  // included here as an example.
-  app.use('/simple-token', simpleToken);
-
-  // TODO: Add different types of auth to this route
-  // app.use('/graphql', graphql);
-
-  app.use(errorMiddleware);
-
   return new Promise((resolve, reject) => {
+    const app = express();
+    const server = http.createServer(app);
+
+    // HTML and API need to live on the same port for session auth, haven't
+    // figured out how to get cross-domain cookies working.
+    app.use(express.static(path.join(__dirname, '../public')));
+    app.use(cors());
+    app.use(bodyParser.json());
+    app.use(
+      expressSession({
+        secret: process.env.EXPRESS_SESSION_SECRET,
+        resave: false,
+        saveUninitialized: true,
+        cookie: {
+          maxAge: getTokenExp() * 1000,
+        },
+      })
+    );
+    app.use(makeDbMiddleware(db));
+
+    app.use('/jwt', jwt);
+    app.use('/session', session);
+    app.use('/oauth', oauth);
+    // NOTE: simple-token is not a secure method of auth, only
+    // included here as an example.
+    app.use('/simple-token', simpleToken);
+
+    // TODO: Add different types of auth to this route
+    // app.use('/graphql', graphql);
+
+    app.use(errorMiddleware);
+
     server.on('error', (e) => {
       console.error(e);
       reject(e);
