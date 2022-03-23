@@ -6,6 +6,8 @@ const { getTokenExp, makeResponse } = require('../utils');
 
 const router = express.Router();
 
+// In production, falling back to a secret would be insecure
+const { JWT_SECRET = 'no JWT secret' } = process.env;
 const SALT_ROUNDS = 1;
 
 const handleSignUp = async ({ username, password }, users) => {
@@ -28,7 +30,7 @@ const handleSignUp = async ({ username, password }, users) => {
   const hash = await bcrypt.hash(password, SALT_ROUNDS).catch(console.error);
   await users.insertOne({ username, hash });
 
-  const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+  const token = jwt.sign({ username }, JWT_SECRET, {
     expiresIn: getTokenExp(),
   });
   return makeResponse({ token });
@@ -59,7 +61,7 @@ const handleLogin = async ({ username, password }, users) => {
     });
   }
 
-  const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+  const token = jwt.sign({ username }, JWT_SECRET, {
     expiresIn: getTokenExp(),
   });
   return makeResponse({ token });
@@ -75,7 +77,7 @@ const jwtMiddleware = (req, res, next) => {
   try {
     // JWT has build in expiration check
     const token = authorization.split('Bearer ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = { username: decoded.username };
     next();
   } catch (err) {

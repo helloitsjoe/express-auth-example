@@ -12,6 +12,9 @@ const simpleToken = require('./routes/simpleToken');
 const { makeDbMiddleware, errorMiddleware } = require('./middleware');
 const { getTokenExp } = require('./utils');
 
+// In production, falling back to a secret would be insecure
+const { EXPRESS_SESSION_SECRET = 'no secret' } = process.env;
+
 const makeAuthServer = async (port = 3001, db) => {
   return new Promise((resolve, reject) => {
     const app = express();
@@ -24,7 +27,7 @@ const makeAuthServer = async (port = 3001, db) => {
     app.use(bodyParser.json());
     app.use(
       expressSession({
-        secret: process.env.EXPRESS_SESSION_SECRET || 'no secret',
+        secret: EXPRESS_SESSION_SECRET,
         resave: false,
         saveUninitialized: true,
         cookie: {
